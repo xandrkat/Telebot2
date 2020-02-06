@@ -47,7 +47,20 @@ class CreateBotCommand extends Command
         $this->info('You have successfully created a bot, now a webhook is being set..');
 
         $client = new Guzzle();
-        $response = $client->get('https://api.telegram.org/bot' . $bot->token . '/setWebhook?url=' . env('APP_URL') . '/hook/' . $bot->id);
+       // $response = $client->get('https://api.telegram.org/bot' . $bot->token . '/setWebhook?url=' . env('APP_URL') . '/hook/' . $bot->id);
+        $sslCert = file_get_contents(storage_path('ssl').'/'.env('APP_HOST_INFO').'.pem');
+        $response = $client->request('POST', 'https://api.telegram.org/bot' . $bot->token . '/setWebhook', [
+            'multipart' => [
+                [
+                    'name'     => 'url',
+                    'contents' => env('APP_URL') . '/hook/' . $bot->id
+                ],
+                [
+                    'name'     => 'certificate',
+                    'contents' => $sslCert
+                ]
+            ]
+        ]);
         $body = json_decode((string)$response->getBody(), true);
         if ($body['result'] === true && $body['ok'] === true) {
             $this->info('Success! You have set the bot hook URL successfully!');

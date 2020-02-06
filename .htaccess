@@ -1,0 +1,14 @@
+<IfModule mod_autoindex.c>
+	Options Indexes
+</IfModule>
+<IfModule mod_rewrite.c>
+	Options +SymLinksIfOwnerMatch
+	RewriteEngine On
+	RewriteBase /
+	RewriteCond %{HTTP_HOST} (.*)
+	RewriteCond %{REQUEST_URI} /$ [NC]
+	RewriteRule ^(.*)(/)$ $1 [R=301,L]
+	# Redirect all requests to web
+	RewriteCond %{REQUEST_URI} ^(.*)$
+	RewriteRule ^(.*)$ public/$1
+</IfModule>
